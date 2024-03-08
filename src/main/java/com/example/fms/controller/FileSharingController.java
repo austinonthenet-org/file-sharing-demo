@@ -39,7 +39,7 @@ public class FileSharingController {
             log.info("fileSize = "+body.length+" bytes.");
             Storage storage = StorageOptions.newBuilder().setProjectId("graphite-nectar-415602").build().getService();
             BlobInfo blobInfo = BlobInfo.newBuilder(BlobId.of("fs-landing-bkt", 
-                    "relativePath"))
+                    relativePath))
                     .build();
             log.info("starting upload to bucket.");
             storage.create(blobInfo, body);
