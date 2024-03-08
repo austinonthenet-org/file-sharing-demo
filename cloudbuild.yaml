@@ -3,3 +3,6 @@ steps:
   args: ['install']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'gcr.io/graphite-nectar-415602/file-sharing-demo', '.']
+options:
+  logging: CLOUD_LOGGING_ONLY
+
