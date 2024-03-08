@@ -2,7 +2,7 @@ steps:
 - name: 'gcr.io/cloud-builders/mvn'
   args: ['install']
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/graphite-nectar-415602/file-sharing-demo', '.']
+  args: ['build', '-t', 'us-west1-docker.pkg.dev/graphite-nectar-415602/cloud-run-source-deploy/file-sharing-demo', '.']
 images: ['us-west1-docker.pkg.dev/graphite-nectar-415602/cloud-run-source-deploy/file-sharing-demo']
 options:
   logging: CLOUD_LOGGING_ONLY
