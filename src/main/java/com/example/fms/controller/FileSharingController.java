@@ -79,7 +79,7 @@ public class FileSharingController {
     }
     
     @GetMapping("/{brand}/{relative_path}")
-    public ResponseEntity<InputStream> processDownload(HttpServletRequest request,
+    public ResponseEntity<byte[]> processDownload(HttpServletRequest request,
             @PathVariable(name = "brand") String brandId, 
             @PathVariable(name = "relative_path") String relativePath,
             HttpServletResponse response) {
@@ -96,8 +96,8 @@ public class FileSharingController {
                 String mimeType = blob.asBlobInfo().getContentType();
     
                 //storage.downloadTo(blobId, os, null);
-                ReadChannel reader = blob.reader();
-                return ResponseEntity.ok().contentType(MediaType.valueOf(mimeType)).body(Channels.newInputStream(reader));
+                //ReadChannel reader = blob.getContent();
+                return ResponseEntity.ok().contentType(MediaType.valueOf(mimeType)).body(blob.getContent());
             }
             log.info("done download.");
             
