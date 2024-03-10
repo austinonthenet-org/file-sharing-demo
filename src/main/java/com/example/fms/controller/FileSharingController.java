@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.cloud.ReadChannel;
 import com.google.cloud.storage.Blob;
@@ -78,7 +79,7 @@ public class FileSharingController {
     }
     
     @GetMapping("/{brand}/{relative_path}")
-    public ResponseEntity processDownload(HttpServletRequest request,
+    public ResponseEntity<InputStream> processDownload(HttpServletRequest request,
             @PathVariable(name = "brand") String brandId, 
             @PathVariable(name = "relative_path") String relativePath,
             HttpServletResponse response) {
