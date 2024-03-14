@@ -57,10 +57,13 @@ public class FileSharingController {
 
             // TODO: call ClamAV for virus scan
             HttpResponse response = makeGetRequest("https://hello-3fxgfyig7a-uc.a.run.app/", "https://hello-3fxgfyig7a-uc.a.run.app");
-            if (response != null) {
+            if (response == null || !"OK".equals(response.getStatusMessage())) {
                 log.info("Response status: "+ new String(response.getStatusMessage()));
                 log.info("Response body: "+ new String(response.getContent().readAllBytes()));
+                return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body("Failed!!");
             }
+            
+            log.info("Response status: "+ new String(response.getStatusMessage()));
 
             // TODO: call Google Vision API for image profanity
 
