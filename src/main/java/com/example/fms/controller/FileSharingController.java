@@ -58,6 +58,7 @@ public class FileSharingController {
             // TODO: call ClamAV for virus scan
             HttpResponse response = makeGetRequest("https://hello-3fxgfyig7a-uc.a.run.app/", "https://hello-3fxgfyig7a-uc.a.run.app");
             if (response != null) {
+                log.info("Response status: "+ new String(response.getStatusMessage()));
                 log.info("Response body: "+ new String(response.getContent().readAllBytes()));
             }
 
