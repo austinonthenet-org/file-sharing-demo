@@ -43,7 +43,7 @@ public class FileSharingController {
     String projectId;
 
     @PutMapping("/{brand}/{relative_path}")
-    public String processUpload(HttpServletRequest request, @PathVariable(name = "brand") String brandId,
+    public ResponseEntity<String> processUpload(HttpServletRequest request, @PathVariable(name = "brand") String brandId,
             @PathVariable(name = "relative_path") String relativePath) {
 
         byte[] body;
@@ -77,7 +77,7 @@ public class FileSharingController {
             // ex.printStackTrace();
         }
 
-        return "Success!";
+        return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body("Success!!");
 
     }
     
