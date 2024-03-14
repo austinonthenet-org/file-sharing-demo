@@ -87,13 +87,16 @@ public class FileSharingController {
             if (!(credentials instanceof IdTokenProvider)) {
               throw new IllegalArgumentException("Credentials are not an instance of IdTokenProvider.");
             }
+            
+            log.info("credentials: "+credentials.toString());
+            
             IdTokenCredentials tokenCredential =
                 IdTokenCredentials.newBuilder()
                     .setIdTokenProvider((IdTokenProvider) credentials)
                     .setTargetAudience(audience)
                     .build();
     
-            log.info("tokenCredential: "+tokenCredential.getAccessToken().getTokenValue());
+            log.info("tokenCredential: "+tokenCredential.toString());
             
             GenericUrl genericUrl = new GenericUrl(serviceUrl);
             HttpCredentialsAdapter adapter = new HttpCredentialsAdapter(tokenCredential);
