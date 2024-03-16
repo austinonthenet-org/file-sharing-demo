@@ -12,10 +12,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.google.api.client.http.ByteArrayContent;
+import com.google.api.client.http.FileContent;
 import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpHeaders;
+import com.google.api.client.http.HttpMediaType;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.MultipartContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -56,7 +61,7 @@ public class FileSharingController {
             String mimeType = tika.detect(body);
 
             // TODO: call ClamAV for virus scan
-            HttpResponse response = makeGetRequest("https://hello-3fxgfyig7a-uc.a.run.app/", "https://hello-3fxgfyig7a-uc.a.run.app");
+            HttpResponse response = makeScanRequest("https://clam-rest-service-3fxgfyig7a-uc.a.run.app/", "https://clam-rest-service-3fxgfyig7a-uc.a.run.app", mimeType, body);
             if (response == null || !"OK".equals(response.getStatusMessage())) {
                 log.info("Response status: "+ new String(response.getStatusMessage()));
                 log.info("Response body: "+ new String(response.getContent().readAllBytes()));
@@ -82,6 +87,49 @@ public class FileSharingController {
 
         return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body("Success!!");
 
+    }
+    
+    public static HttpResponse makeScanRequest(String serviceUrl, String audience, String contentType, byte[] contentBytes) throws IOException {
+        try {
+            log.info("making inter service call...");
+            GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
+            if (!(credentials instanceof IdTokenProvider)) {
+              throw new IllegalArgumentException("Credentials are not an instance of IdTokenProvider.");
+            }
+            
+            log.info("credentials: "+credentials.toString());
+            
+            IdTokenCredentials tokenCredential =
+                IdTokenCredentials.newBuilder()
+                    .setIdTokenProvider((IdTokenProvider) credentials)
+                    .setTargetAudience(audience)
+                    .build();
+    
+            log.info("tokenCredential: "+tokenCredential.toString());
+            
+            GenericUrl genericUrl = new GenericUrl(serviceUrl);
+            HttpCredentialsAdapter adapter = new HttpCredentialsAdapter(tokenCredential);
+            HttpTransport transport = new NetHttpTransport();
+            
+            // Add parameters
+            MultipartContent content = new MultipartContent().setMediaType(
+                    new HttpMediaType("multipart/form-data")
+                            .setParameter("boundary", "__END_OF_PART__"));
+            // Add file
+            ByteArrayContent fileContent = new ByteArrayContent(
+                    contentType, contentBytes);
+            MultipartContent.Part part = new MultipartContent.Part(fileContent);
+            part.setHeaders(new HttpHeaders().set(
+                    "Content-Disposition", 
+                    String.format("form-data; name=\"content\"; filename=\"test\"")));
+            content.addPart(part);
+            
+            HttpRequest request = transport.createRequestFactory(adapter).buildPostRequest(genericUrl, content);
+            return request.execute();
+        } catch (Exception e) {
+            log.error("Exception calling other cloud-run service.", e);
+        }
+        return null;
     }
     
     public static HttpResponse makeGetRequest(String serviceUrl, String audience) throws IOException {
