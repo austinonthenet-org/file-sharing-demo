@@ -61,7 +61,7 @@ public class FileSharingController {
             String mimeType = tika.detect(body);
 
             // TODO: call ClamAV for virus scan
-            HttpResponse response = makeScanRequest("https://clam-rest-service-3fxgfyig7a-uc.a.run.app/", "https://clam-rest-service-3fxgfyig7a-uc.a.run.app", mimeType, body);
+            HttpResponse response = makeScanRequest("https://clam-rest-service-3fxgfyig7a-uc.a.run.app/scan", "https://clam-rest-service-3fxgfyig7a-uc.a.run.app", mimeType, body);
             if (response == null || !"OK".equals(response.getStatusMessage())) {
                 log.info("Response status: "+ new String(response.getStatusMessage()));
                 log.info("Response body: "+ new String(response.getContent().readAllBytes()));
