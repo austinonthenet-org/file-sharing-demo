@@ -61,11 +61,15 @@ public class FileSharingController {
             String mimeType = tika.detect(body);
 
             // TODO: call ClamAV for virus scan
-            HttpResponse response = makeScanRequest("https://clam-rest-service-3fxgfyig7a-uc.a.run.app/scan", "https://clam-rest-service-3fxgfyig7a-uc.a.run.app", mimeType, body);
-            if (response == null || !"OK".equals(response.getStatusMessage())) {
+            HttpResponse response = makeScanRequest("https://clam-rest-service-3fxgfyig7a-uc.a.run.app/scan", "https://clam-rest-service-3fxgfyig7a-uc.a.run.app", mimeType, body, relativePath);
+            if (response == null) {
                 log.info("Response status: "+ new String(response.getStatusMessage()));
                 log.info("Response body: "+ new String(response.getContent().readAllBytes()));
                 return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body("Failed!!");
+            } else if (!"OK".equals(response.getStatusMessage())) {
+                if (response.getStatusCode() == 406) {
+                    return ResponseEntity.badRequest().contentType(MediaType.TEXT_HTML).body("Infected!!" + response.getContent().readAllBytes());
+                }
             }
             
             log.info("Response status: "+ new String(response.getStatusMessage()));
@@ -89,7 +93,7 @@ public class FileSharingController {
 
     }
     
-    public static HttpResponse makeScanRequest(String serviceUrl, String audience, String contentType, byte[] contentBytes) throws IOException {
+    public static HttpResponse makeScanRequest(String serviceUrl, String audience, String contentType, byte[] contentBytes, String fileName) throws IOException {
         try {
             log.info("making inter service call...");
             GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
@@ -121,7 +125,7 @@ public class FileSharingController {
             MultipartContent.Part part = new MultipartContent.Part(fileContent);
             part.setHeaders(new HttpHeaders().set(
                     "Content-Disposition", 
-                    String.format("form-data; name=\"content\"; filename=\"test\"")));
+                    String.format("form-data; name=\"content\"; filename=\"%s\"", fileName)));
             content.addPart(part);
             
             HttpRequest request = transport.createRequestFactory(adapter).buildPostRequest(genericUrl, content);
