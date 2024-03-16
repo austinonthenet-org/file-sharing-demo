@@ -18,6 +18,7 @@ import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpMediaType;
 import com.google.api.client.http.HttpResponse;
+import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.MultipartContent;
@@ -83,6 +84,10 @@ public class FileSharingController {
 
             storage.create(blobInfo, body);
             log.info("done upload to bucket.");
+        } catch (HttpResponseException hre) { 
+            if (hre.getStatusCode() == 406) {
+                return ResponseEntity.badRequest().contentType(MediaType.TEXT_HTML).body("Infected!!" + hre.getStatusMessage());
+            }
         } catch (IOException ex) {
             body = new byte[0];
             log.error("Body parsing exception occurred", ex);
@@ -130,6 +135,8 @@ public class FileSharingController {
             
             HttpRequest request = transport.createRequestFactory(adapter).buildPostRequest(genericUrl, content);
             return request.execute();
+        } catch (HttpResponseException hre) { 
+            throw hre;
         } catch (Exception e) {
             log.error("Exception calling other cloud-run service.", e);
         }
