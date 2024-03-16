@@ -64,8 +64,7 @@ public class FileSharingController {
             // TODO: call ClamAV for virus scan
             HttpResponse response = makeScanRequest("https://clam-rest-service-3fxgfyig7a-uc.a.run.app/scan", "https://clam-rest-service-3fxgfyig7a-uc.a.run.app", mimeType, body, relativePath);
             if (response == null) {
-                log.info("Response status: "+ new String(response.getStatusMessage()));
-                log.info("Response body: "+ new String(response.getContent().readAllBytes()));
+                log.error("response null !!");
                 return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body("Failed!!");
             } else if (!"OK".equals(response.getStatusMessage())) {
                 if (response.getStatusCode() == 406) {
@@ -86,8 +85,10 @@ public class FileSharingController {
             log.info("done upload to bucket.");
         } catch (HttpResponseException hre) { 
             if (hre.getStatusCode() == 406) {
-                return ResponseEntity.badRequest().contentType(MediaType.TEXT_HTML).body("Infected!!" + hre.getStatusMessage());
+                return ResponseEntity.badRequest().contentType(MediaType.TEXT_HTML).body("Infected!! " + hre.getMessage());
             }
+            log.error("HttpResponseException ", hre);
+            return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body("Failed!!");
         } catch (IOException ex) {
             body = new byte[0];
             log.error("Body parsing exception occurred", ex);
