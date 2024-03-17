@@ -126,7 +126,7 @@ public class FileSharingController {
             // Builds the image annotation request
             List<AnnotateImageRequest> requests = new ArrayList<>();
             Image img = Image.newBuilder().setContent(imgBytes).build();
-            Feature feat = Feature.newBuilder().setType(Type.LABEL_DETECTION).build();
+            Feature feat = Feature.newBuilder().setType(Type.SAFE_SEARCH_DETECTION).build();
             AnnotateImageRequest request =
                 AnnotateImageRequest.newBuilder().addFeatures(feat).setImage(img).build();
             requests.add(request);
