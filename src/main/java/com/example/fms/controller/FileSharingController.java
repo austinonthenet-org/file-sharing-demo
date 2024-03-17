@@ -88,6 +88,10 @@ public class FileSharingController {
             }
             
             log.info("Response status: "+ new String(response.getStatusMessage()));
+            
+            if (imageProfanityFound(body)) {
+                return ResponseEntity.badRequest().contentType(MediaType.TEXT_HTML).body("Profanity Detected!!");
+            }
 
             // TODO: call Google Vision API for image profanity
 
@@ -114,7 +118,7 @@ public class FileSharingController {
 
     }
     
-    public static boolean checkImageProfanity(byte[] data) {
+    public static boolean imageProfanityFound(byte[] data) {
         try (ImageAnnotatorClient vision = ImageAnnotatorClient.create()) {
 
             ByteString imgBytes = ByteString.copyFrom(data);
