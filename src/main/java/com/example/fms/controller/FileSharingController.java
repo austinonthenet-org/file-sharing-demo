@@ -1,6 +1,8 @@
 package com.example.fms.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +34,16 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+import com.google.protobuf.ByteString;
+
+import com.google.cloud.vision.v1.AnnotateImageRequest;
+import com.google.cloud.vision.v1.AnnotateImageResponse;
+import com.google.cloud.vision.v1.BatchAnnotateImagesResponse;
+import com.google.cloud.vision.v1.EntityAnnotation;
+import com.google.cloud.vision.v1.Feature;
+import com.google.cloud.vision.v1.Feature.Type;
+import com.google.cloud.vision.v1.Image;
+import com.google.cloud.vision.v1.ImageAnnotatorClient;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -47,6 +59,8 @@ public class FileSharingController {
 
     @Value("${google.project.id}")
     String projectId;
+    
+    //private ImageAnnotatorClient imageAnnotatorClient = ImageAnnotatorClient.create();
 
     @PutMapping("/{brand}/{relative_path}")
     public ResponseEntity<String> processUpload(HttpServletRequest request, @PathVariable(name = "brand") String brandId,
@@ -98,6 +112,43 @@ public class FileSharingController {
 
         return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body("Success!!");
 
+    }
+    
+    public static boolean checkImageProfanity(byte[] data) {
+        try (ImageAnnotatorClient vision = ImageAnnotatorClient.create()) {
+
+            ByteString imgBytes = ByteString.copyFrom(data);
+
+            // Builds the image annotation request
+            List<AnnotateImageRequest> requests = new ArrayList<>();
+            Image img = Image.newBuilder().setContent(imgBytes).build();
+            Feature feat = Feature.newBuilder().setType(Type.LABEL_DETECTION).build();
+            AnnotateImageRequest request =
+                AnnotateImageRequest.newBuilder().addFeatures(feat).setImage(img).build();
+            requests.add(request);
+
+            // Performs label detection on the image file
+            BatchAnnotateImagesResponse response = vision.batchAnnotateImages(requests);
+            List<AnnotateImageResponse> responses = response.getResponsesList();
+
+            log.info("Responses from Vision API: "+responses);
+            for (AnnotateImageResponse res : responses) {
+              if (res.hasError()) {
+                System.out.format("Error: %s%n", res.getError().getMessage());
+                return false;
+              }
+
+              for (EntityAnnotation annotation : res.getLabelAnnotationsList()) {
+                annotation
+                    .getAllFields()
+                    .forEach((k, v) -> System.out.format("%s : %s%n", k, v.toString()));
+              }
+            }
+          } catch (Exception e) {
+              log.error("Exception calling Vision API", e);
+              return false;
+          }
+        return false;
     }
     
     public static HttpResponse makeScanRequest(String serviceUrl, String audience, String contentType, byte[] contentBytes, String fileName) throws IOException {
