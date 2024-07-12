@@ -23,4 +23,4 @@ jobs:
   
   run-release-pipeline:
     uses: austinonthenet/shared-workflows/.github/workflows/maven_release.yml@main
-    if: (github.ref == 'refs/heads/master' && ${{inputs.release_build}} )
+    if: ( github.ref == 'refs/heads/master' && ${{github.event.inputs.release_build == 'true'}} )
