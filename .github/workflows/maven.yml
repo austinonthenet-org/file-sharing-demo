@@ -9,11 +9,26 @@
 name: Java CI with Maven
 
 on:
+  workflow_dispatch:
+    inputs:
+      release_build:
+        type: boolean
+        required: false
+        default: false
+        description: Is Release Build ?
   push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
 
 jobs:
-  run-reusable-pipeline:
+  
+  run-pr-pipeline:
+    uses: austinonthenet/shared-workflows/.github/workflows/maven_pr.yml@main
+    if: github.event_name == 'pull_request'
+  
+  run-snapshot-pipeline:
+    uses: austinonthenet/shared-workflows/.github/workflows/maven_snapshot.yml@main
+    if: github.event_name != 'pull_request'
+  
+  run-release-pipeline:
     uses: austinonthenet/shared-workflows/.github/workflows/maven_build.yml@main
+    if: (github.ref == 'refs/heads/master' && ${{inputs.release_build}} )
