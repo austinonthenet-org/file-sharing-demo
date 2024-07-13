@@ -1,0 +1,10 @@
+name: Pull Request Workflow
+
+on:
+  pull_request:
+
+jobs:
+  
+  run-pr-pipeline:
+    uses: austinonthenet/shared-workflows/.github/workflows/maven_pr.yml@main
+  
