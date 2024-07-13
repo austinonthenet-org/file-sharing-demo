@@ -15,5 +15,5 @@ on:
 jobs:
   
   run-release-pipeline:
-    uses: austinonthenet/shared-workflows/.github/workflows/maven_release.yml@main
+    uses: austinonthenet-org/shared-workflows/.github/workflows/maven_release.yml@main
     if: "${{ github.event.inputs.release_build == 'true' }}"
