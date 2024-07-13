@@ -20,5 +20,5 @@ jobs:
       - name: echo-vars
         run: echo "MVN_SETTINGS_XML = [ ${{vars.MVN_SETTINGS_XML}} ]"
   run-snapshot-pipeline:
-    uses: austinonthenet/shared-workflows/.github/workflows/maven_snapshot.yml@main
+    uses: austinonthenet-org/shared-workflows/.github/workflows/maven_snapshot.yml@main
 
