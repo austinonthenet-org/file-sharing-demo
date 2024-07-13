@@ -1,0 +1,19 @@
+name: Release Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_build:
+        type: boolean
+        required: false
+        default: false
+        description: Is Release Build ?
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  
+  run-release-pipeline:
+    uses: austinonthenet/shared-workflows/.github/workflows/maven_release.yml@main
+    if: "${{ github.event.inputs.release_build == 'true' }}"
