@@ -14,15 +14,6 @@ env:
   MAVEN_ARTIFACTORY_URL: ${{ vars.MAVEN_ARTIFACTORY_URL }}
 
 jobs:
-  leaf-job:
-    runs-on: ubuntu-latest
-    steps:
-      - name: dump-env
-        run: echo "MAVEN_ARTIFACTORY_URL=$MAVEN_ARTIFACTORY_URL"
-      - name: echo-secrets
-        run: echo "Hello World! Pre Checks OVERRIDDEN_SECRET_1= [ ${{ secrets.OVERRIDDEN_SECRET_1 }} ], CALLER_REPO_SECRET_1= [ ${{ secrets.CALLER_REPO_SECRET_1 }} ]"
-      - name: echo-vars
-        run: echo "MVN_SETTINGS_XML = [ ${{vars.MVN_SETTINGS_XML}} ]"
   run-snapshot-pipeline:
     uses: austinonthenet-org/shared-workflows/.github/workflows/build_and_deploy.yml@main
 
