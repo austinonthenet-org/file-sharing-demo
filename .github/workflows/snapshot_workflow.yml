@@ -10,6 +10,8 @@ on:
         description: Is Release Build ?
   push:
 
+env:
+  MAVEN_ARTIFACTORY_URL: "some/url"
 
 jobs:
   leaf-job:
